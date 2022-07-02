@@ -40,31 +40,31 @@ for dim in _DAYS_IN_MONTH[1:]:
 del dbm, dim
 
 def _is_leap(year):
-    "year -> 1 if leap year, else 0."
+    """year -> 1 if leap year, else 0."""
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 def _days_before_year(year):
-    "year -> number of days before January 1st of year."
+    """year -> number of days before January 1st of year."""
     y = year - 1
     return y*365 + y//4 - y//100 + y//400
 
 def _days_in_month(year, month):
-    "year, month -> number of days in that month in that year."
-    assert 1 <= month <= 12, month
+    """year, month -> number of days in that month in that year."""
+    assert 1 <= month <= 12, 'month must be in 1..12'
     if month == 2 and _is_leap(year):
         return 29
     return _DAYS_IN_MONTH[month]
 
 def _days_before_month(year, month):
-    "year, month -> number of days in year preceding first day of month."
+    """year, month -> number of days in year preceding first day of month."""
     assert 1 <= month <= 12, 'month must be in 1..12'
     return _DAYS_BEFORE_MONTH[month] + (month > 2 and _is_leap(year))
 
 def _ymd2ord(year, month, day):
-    "year, month, day -> ordinal, considering 01-Jan-0001 as day 1."
+    """year, month, day -> ordinal, considering 01-Jan-0001 as day 1."""
     assert 1 <= month <= 12, 'month must be in 1..12'
     dim = _days_in_month(year, month)
-    assert 1 <= day <= dim, ('day must be in 1..%d' % dim)
+    assert 1 <= day <= dim, (f'day must be in 1..{dim}')
     return (_days_before_year(year) +
             _days_before_month(year, month) +
             day)
@@ -77,16 +77,16 @@ _DI4Y   = _days_before_year(5)      #    "    "   "   "   4   "
 # together 4 single years.
 assert _DI4Y == 4 * 365 + 1
 
+# On the other hand, a 100-year cycle has one fewer leap day than we'd get 
+# from pasting together 25 4-year cycles.
+assert _DI100Y == 25 * _DI4Y - 1
+
 # Similarly, a 400-year cycle has an extra leap day over what we'd get from
 # pasting together 4 100-year cycles.
 assert _DI400Y == 4 * _DI100Y + 1
 
-# OTOH, a 100-year cycle has one fewer leap day than we'd get from
-# pasting together 25 4-year cycles.
-assert _DI100Y == 25 * _DI4Y - 1
-
 def _ord2ymd(n):
-    "ordinal -> (year, month, day), considering 01-Jan-0001 as day 1."
+    """ordinal -> (year, month, day), considering 01-Jan-0001 as day 1."""
 
     # n is a 1-based index, starting at 1-Jan-1.  The pattern of leap years
     # repeats exactly every 400 years.  The basic strategy is to find the
